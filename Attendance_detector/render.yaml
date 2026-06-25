@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: attendance-detector
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: HF_MODEL
+        value: Qwen/Qwen3-VL-8B-Instruct
+      - key: HF_TOKEN
+        sync: false   # set this in the Render dashboard (do NOT commit it)
