@@ -48,7 +48,7 @@ present/absent table. The app:
 3. Shows the result in a color-coded table with present/absent counts.
 
 > Flask backend · plain HTML/CSS/JS frontend · deploys to Render.
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+>>>>>>> 
 
 ---
 
@@ -83,7 +83,7 @@ Attendance_detector/
 └── static/
     ├── style.css
     └── script.js
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+
 ```
 
 ---
@@ -115,7 +115,7 @@ The default model is `Qwen/Qwen3-VL-8B-Instruct`, served through HF
 model only works if a provider you've enabled serves it — check/enable providers
 at <https://huggingface.co/settings/inference-providers>. If you hit a "not
 supported by any provider you have enabled" error, switch `HF_MODEL` (see below).
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+>>>>>>
 
 ---
 
@@ -164,7 +164,7 @@ Health check: <http://localhost:5000/healthz> (shows whether the token is set).
 =======
 3. When prompted, set the **`HF_TOKEN`** environment variable to your token
    (it's marked `sync: false`, so it is never stored in the repo).
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+
 4. Deploy. The public URL serves the same UI.
 
 ### Option B — Manual Web Service
@@ -362,4 +362,4 @@ to the fallback instead of being returned.
   ]
 }
 ```
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+
