@@ -149,7 +149,7 @@ Open <http://localhost:5000>, upload a sheet, click **Preview filter** to see th
 cleaned image, then **Analyze attendance**.
 
 Health check: <http://localhost:5000/healthz> (shows whether the token is set).
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+>>>>>>> 
 
 ---
 
