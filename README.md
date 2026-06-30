@@ -1,5 +1,6 @@
 # 📋 Attendance Detector
 
+<<<<<<< HEAD
 Upload a photo or scan of a class **attendance sheet** and get back a clean
 present/absent table, keyed by **roll number**. The marks are read
 **deterministically with OpenCV** (optical mark recognition), so the result does
@@ -32,6 +33,22 @@ narrow crop, and the tiled fallback above. The output never includes student
 names — only the **roll number** and the per-day present/absent state.
 
 > Flask backend · OpenCV OMR engine · plain HTML/CSS/JS frontend · deploys to Render.
+=======
+Application Demo Link: https://vision-attendance-system.onrender.com
+
+Upload a photo or scan of a class **attendance sheet** and get back a clean
+present/absent table. The app:
+
+1. **Preprocesses** the image with OpenCV (resize → denoise → contrast boost →
+   auto-deskew → sharpen, with an optional high-contrast binarize) so faint or
+   blurry circles become readable.
+2. Sends the cleaned image to a **Hugging Face vision-language model** which
+   reads the names, dates, and circles — a **filled circle = present**, an
+   **empty circle = absent** — and returns structured JSON.
+3. Shows the result in a color-coded table with present/absent counts.
+
+> Flask backend · plain HTML/CSS/JS frontend · deploys to Render.
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 
 ---
 
@@ -40,9 +57,14 @@ names — only the **roll number** and the per-day present/absent state.
 ```
 Attendance_detector/
 ├── app.py              # Flask app + API routes
+<<<<<<< HEAD
 ├── omr.py              # OpenCV OMR engine (rectify, grid, roles, mark reading, fallback)
 ├── preprocess.py       # OpenCV image cleanup (preview + shared image helpers)
 ├── hf_client.py        # Hugging Face client (roll-strip OCR + tiled chunk reads)
+=======
+├── preprocess.py       # OpenCV image cleanup
+├── hf_client.py        # Hugging Face Inference Providers client
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 ├── requirements.txt
 ├── render.yaml         # Render blueprint
 ├── Procfile
@@ -50,16 +72,23 @@ Attendance_detector/
 ├── .env.example
 ├── templates/
 │   └── index.html
+<<<<<<< HEAD
 ├── static/
 │   ├── style.css
 │   └── script.js
 └── tests/              # synthetic accuracy harness (see tests/README.md)
     ├── generate_sheets.py
     └── eval_omr.py
+=======
+└── static/
+    ├── style.css
+    └── script.js
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 ```
 
 ---
 
+<<<<<<< HEAD
 ## 1. Hugging Face token (optional)
 
 The present/absent marks are read **entirely offline with OpenCV**, so a token is
@@ -74,6 +103,19 @@ back to row numbers (1, 2, 3, …) and the fallback is disabled.
    a provider you've enabled serves it — manage providers at
    <https://huggingface.co/settings/inference-providers>. On a "not supported by
    any provider" error, switch `HF_MODEL` (see Configuration).
+=======
+## 1. Get a Hugging Face token (free)
+
+1. Sign in / create an account at <https://huggingface.co>.
+2. Go to **Settings → Access Tokens** → <https://huggingface.co/settings/tokens>.
+3. Create a token with **Read** access and copy it (`hf_...`).
+
+The default model is `Qwen/Qwen3-VL-8B-Instruct`, served through HF
+**Inference Providers**. A free account includes a monthly inference credit. A
+model only works if a provider you've enabled serves it — check/enable providers
+at <https://huggingface.co/settings/inference-providers>. If you hit a "not
+supported by any provider you have enabled" error, switch `HF_MODEL` (see below).
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 
 ---
 
@@ -89,6 +131,7 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
+<<<<<<< HEAD
 cp .env.example .env          # optional: paste your HF_TOKEN
 python app.py
 ```
@@ -97,6 +140,16 @@ Open <http://localhost:5000>, upload a sheet, optionally click **Preview filter*
 to see the cleaned image, then **Analyze attendance**.
 
 Health check: <http://localhost:5000/healthz> (shows whether a token is set).
+=======
+cp .env.example .env          # then edit .env and paste your HF_TOKEN
+python app.py
+```
+
+Open <http://localhost:5000>, upload a sheet, click **Preview filter** to see the
+cleaned image, then **Analyze attendance**.
+
+Health check: <http://localhost:5000/healthz> (shows whether the token is set).
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 
 ---
 
@@ -105,25 +158,41 @@ Health check: <http://localhost:5000/healthz> (shows whether a token is set).
 ### Option A — Blueprint (recommended)
 1. Push this folder to a GitHub repo.
 2. In Render: **New → Blueprint**, pick the repo. Render reads `render.yaml`.
+<<<<<<< HEAD
 3. (Optional) set the **`HF_TOKEN`** environment variable (marked `sync: false`,
    so it is never stored in the repo).
+=======
+3. When prompted, set the **`HF_TOKEN`** environment variable to your token
+   (it's marked `sync: false`, so it is never stored in the repo).
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 4. Deploy. The public URL serves the same UI.
 
 ### Option B — Manual Web Service
 - **Build command:** `pip install -r requirements.txt`
 - **Start command:** `gunicorn app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT`
+<<<<<<< HEAD
 - **Environment variables:** `HF_MODEL` (optional), `HF_TOKEN` (optional),
   `PYTHON_VERSION=3.12.7`
 
 > Keep the gunicorn `--timeout` at 120s: the tiled VLM fallback is bounded to a
 > ~90s budget and returns a partial result before the worker is killed. On
 > Render's **free** plan the service sleeps after inactivity, so the first
+=======
+- **Environment variables:** `HF_TOKEN` (required), `HF_MODEL` (optional),
+  `PYTHON_VERSION=3.12.7`
+
+> The long gunicorn `--timeout` matters: vision-model calls take ~10–30s and the
+> default 30s timeout would otherwise kill the request.
+>
+> On Render's **free** plan the service sleeps after inactivity, so the first
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 > request after idle may take a while to wake up.
 
 ---
 
 ## Configuration
 
+<<<<<<< HEAD
 | Variable   | Required | Default                       | Notes |
 |------------|----------|-------------------------------|-------|
 | `HF_TOKEN` | no       | —                             | Hugging Face token. Marks are read offline regardless; the token only enables roll-number OCR and the hard-photo fallback. |
@@ -132,10 +201,23 @@ Health check: <http://localhost:5000/healthz> (shows whether a token is set).
 Other vision models that work well: `Qwen/Qwen3-VL-30B-A3B-Instruct`,
 `Qwen/Qwen2.5-VL-72B-Instruct`, `google/gemma-3-27b-it`,
 `meta-llama/Llama-4-Scout-17B-16E-Instruct`. List models your token can use:
+=======
+| Variable   | Required | Default                         | Notes |
+|------------|----------|---------------------------------|-------|
+| `HF_TOKEN` | yes      | —                               | Hugging Face access token. |
+| `HF_MODEL` | no       | `Qwen/Qwen3-VL-8B-Instruct`     | Any **image-capable** model served by a provider you've enabled. |
+
+Other vision models that work well (use a larger one for messy handwritten photos):
+`Qwen/Qwen3-VL-30B-A3B-Instruct`, `Qwen/Qwen2.5-VL-72B-Instruct`,
+`google/gemma-3-27b-it`, `meta-llama/Llama-4-Scout-17B-16E-Instruct`.
+
+To see exactly which models your token can use, list them with:
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 `curl -H "Authorization: Bearer $HF_TOKEN" https://router.huggingface.co/v1/models`
 
 ---
 
+<<<<<<< HEAD
 ## How accuracy is maximized
 
 - **Deterministic OMR.** Present/absent is decided by measuring each circle's
@@ -175,11 +257,55 @@ python tests/eval_omr.py           # measures cell-level accuracy, offline
 It renders sheets up to 20×30 across six capture conditions (clean, rotated,
 perspective, blur+noise, low-res JPEG, combo) and verifies the deterministic
 path is ~100% on the cases it auto-returns, abstaining (→ fallback) on the rest.
+=======
+## Try it without your own sheet
+
+Two example images ship in [`static/samples/`](static/samples) and appear as
+**"Try an example"** thumbnails on the upload screen — click one, then
+**Analyze attendance**. Great for testing the deployed link.
+
+| Sample | What it tests |
+|--------|---------------|
+| `printed-sheet.png` | Clean printed register (8 students × 3 days) — the easy case. |
+| `handwritten-photo.png` | Tilted phone photo of a hand-drawn sheet — tests preprocessing + robustness. |
+
+Answer key for `printed-sheet.png` (P = present, A = absent):
+
+| Student | Mon 23 | Tue 24 | Wed 25 |
+|---------|:--:|:--:|:--:|
+| Aarav Sharma | P | P | A |
+| Diya Patel | A | P | P |
+| Kabir Singh | P | A | P |
+| Ananya Rao | P | P | A |
+| Vivaan Mehta | A | A | P |
+| Ishita Nair | P | A | A |
+| Rohan Das | A | P | P |
+| Sara Khan | P | P | A |
+
+The default model reads this sheet with 100% accuracy in both normal and
+high-contrast mode.
+
+---
+
+## How accuracy is maximized
+
+- **Preprocessing** removes camera noise and lifts faint pencil marks before the
+  model ever sees the image. Use the **High-contrast (binarize)** toggle for very
+  pale or low-quality scans.
+- The model is prompted to return **strict JSON** and to mark genuinely
+  ambiguous cells as `"unclear"` (shown in amber) rather than guessing.
+
+### Tips for best results
+- Photograph the sheet flat, well-lit, filling the frame.
+- One sheet per image.
+- If names come back garbled, retake the photo closer / sharper.
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921
 
 ---
 
 ## API reference
 
+<<<<<<< HEAD
 | Method | Path           | Body (multipart/form-data)            | Returns |
 |--------|----------------|---------------------------------------|---------|
 | `GET`  | `/`            | —                                     | UI |
@@ -217,3 +343,23 @@ to the fallback instead of being returned.
 - `name` is always `null` (names are never extracted).
 - `review` lists `unclear` cells for a quick human check.
 - `dates` is an alias of `columns`; date-header labels default to `Col 1…N`.
+=======
+| Method | Path           | Body (multipart/form-data)        | Returns |
+|--------|----------------|-----------------------------------|---------|
+| `GET`  | `/`            | —                                 | UI |
+| `POST` | `/api/preview` | `image`, `binarize` (0/1)         | `{ processed_image }` (data URI) |
+| `POST` | `/api/analyze` | `image`, `binarize` (0/1)         | `{ processed_image, result, model }` |
+| `GET`  | `/healthz`     | —                                 | `{ status, token_configured }` |
+
+`result` shape:
+
+```json
+{
+  "dates": ["2026-06-25"],
+  "students": [
+    { "name": "Asha R", "attendance": { "2026-06-25": "present" } },
+    { "name": "Vikram S", "attendance": { "2026-06-25": "absent" } }
+  ]
+}
+```
+>>>>>>> a062e5639debf1cb57716998e5203e220042c921

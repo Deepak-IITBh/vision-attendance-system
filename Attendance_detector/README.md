@@ -1,5 +1,7 @@
 # 📋 Attendance Detector
 
+Application Link: http://127.0.0.1:5000
+
 Upload a photo or scan of a class **attendance sheet** and get back a clean
 present/absent table. The app:
 
