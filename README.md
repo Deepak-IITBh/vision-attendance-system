@@ -64,7 +64,7 @@ Attendance_detector/
 =======
 ├── preprocess.py       # OpenCV image cleanup
 ├── hf_client.py        # Hugging Face Inference Providers client
->>>>>>> a062e5639debf1cb57716998e5203e220042c921
+>>>>>>> 
 ├── requirements.txt
 ├── render.yaml         # Render blueprint
 ├── Procfile
