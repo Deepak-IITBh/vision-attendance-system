@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance Detector · AI sheet reader</title>
+  <meta name="description" content="Upload an attendance sheet and let AI read who's present and absent." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Attendance Detector</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stepper -->
+    <ol class="steps" id="steps">
+      <li class="step is-active" data-step="1"><span class="step-dot">1</span><span class="step-label">Upload</span></li>
+      <li class="step" data-step="2"><span class="step-dot">2</span><span class="step-label">Enhance</span></li>
+      <li class="step" data-step="3"><span class="step-dot">3</span><span class="step-label">Results</span></li>
+    </ol>
+
+    <!-- Upload -->
+    <section class="panel" id="uploadPanel">
+      <div id="dropZone" class="dropzone" role="button" tabindex="0" aria-label="Upload attendance sheet image">
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden />
+        <div class="dropzone-inner">
+          <div class="dropzone-icon">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+          </div>
+          <p class="dropzone-title"><strong>Click to upload</strong> or drag &amp; drop</p>
+          <p class="dropzone-hint">JPG, PNG or WEBP · up to 16&nbsp;MB · one sheet per image</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <label class="switch" title="Use for faint or low-quality scans">
+          <input type="checkbox" id="binarize" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-text">High-contrast mode <em>(faint scans)</em></span>
+        </label>
+
+        <div class="toolbar-actions">
+          <button id="resetBtn" class="btn btn-ghost" hidden>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            New image
+          </button>
+          <button id="previewBtn" class="btn btn-secondary" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview filter
+          </button>
+          <button id="analyzeBtn" class="btn btn-primary" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            Analyze attendance
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Image comparison -->
+    <section class="panel" id="imagesPanel" hidden>
+      <header class="panel-head"><h2>Image</h2></header>
+      <div class="img-grid">
+        <figure class="img-card">
+          <figcaption><span class="tag">Original</span></figcaption>
+          <div class="img-frame"><img id="originalImg" alt="Original upload" /></div>
+        </figure>
+        <figure class="img-card">
+          <figcaption><span class="tag tag-accent">Enhanced · sent to AI</span></figcaption>
+          <div class="img-frame">
+            <img id="processedImg" alt="Enhanced image" hidden />
+            <div id="processedPlaceholder" class="img-placeholder">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1"/></svg>
+            <p>Run <strong>Preview filter</strong> or <strong>Analyze</strong> to generate</p>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section class="panel" id="resultsPanel" hidden>
+      <header class="panel-head">
+        <h2>Attendance</h2>
+        <div class="result-actions">
+          <div class="search">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search student…" />
+          </div>
+          <button id="copyBtn" class="btn btn-ghost btn-sm" title="Copy as table">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button id="csvBtn" class="btn btn-secondary btn-sm" title="Download CSV">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            CSV
+          </button>
+        </div>
+      </header>
+
+      <div class="stats" id="stats"></div>
+      <div class="result-status" id="resultStatus"></div>
+
+      <div class="table-wrap">
+        <table id="resultsTable"></table>
+        <p id="noMatch" class="empty-row" hidden>No students match your search.</p>
+      </div>
+
+      <p class="muted model-note">Read by <span id="modelName">—</span></p>
+    </section>
+  </main>
+
+  <!-- Loading overlay -->
+  <div id="overlay" class="overlay" hidden>
+    <div class="overlay-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="overlayText">Working…</p>
+      <p class="overlay-sub" id="overlaySub"></p>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

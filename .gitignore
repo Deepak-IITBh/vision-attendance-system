@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.DS_Store
+*.log
+uploads/
+.idea/
+.vscode/
+tests/_synth/
